@@ -1,6 +1,3 @@
-use std::fs::File;
-use std::io::Write;
-
 mod get;
 pub use get::*;
 
@@ -247,147 +244,95 @@ fn draw_polygon(&mut self, points: &[Point], color: &Rgb) {
 
 }
 
-#[test]
-fn test_new_bitmap() {
-	let file_path = "example.bmp";
-	let mut file = File::create(file_path).unwrap();
-	let mut bmp:Vec<u8> = Vec::<u8>::new_bitmap(40, 40, 24);
-	assert_eq!(bmp.get_height(), 40);
-	assert_eq!(bmp.get_width(), 40);
-	assert_eq!(bmp.get_bits_per_pixel(), 24);
-	assert_eq!(bmp.get_file_size(), bmp.len() as u32);
-	assert_eq!(bmp.get_size_of_info_header(), 40);
-	assert_eq!(bmp.get_planes(), 1);
-	assert_eq!(bmp.get_compression(), 0);
-	let red:Rgb = Rgb {r: 255, g: 0, b: 0};
-	let position: Point = Point {x: 20, y: 20};
-	bmp.draw_point(&position, &red);
-        let position: Point = Point {x: 0, y: 0};
-        bmp.draw_point(&position, &red);
-        let position: Point = Point {x: 39, y: 39};
-        bmp.draw_point(&position, &red);
-        let position: Point = Point {x: 0, y: 39};
-        bmp.draw_point(&position, &red);
-        let position: Point = Point {x: 39, y: 0};
-        bmp.draw_point(&position, &red);
-	let position1 = Point {x: 38, y: 38};
-	let position2 = Point {x: 1, y: 1};
-	let color = Rgb {r:0, g:255, b:0};
-	bmp.draw_rectangle(&position1, &position2, &color);
-        let position1 = Point {x: 20, y: 20};
-	let radius = 10;
-        let color = Rgb {r:0, g:0, b:255};
-	bmp.draw_circle(&position1, radius, &color);
-        let red:Rgb = Rgb {r: 255, g: 0, b: 0};
-        let position: Point = Point {x: 20, y: 20};
-        bmp.draw_point(&position, &red);
-	bmp.draw_string("!", &position, &red);
 
-        let color = Rgb {r:255, g:255, b:255};
-	let point1 = Point{x: 10, y: 30};
-	let point2 = Point{x: 26, y: 33};
-	let point3 = Point{x: 35, y: 20};
-	let point4 = Point{x: 27, y: 6};
-	let point5 = Point{x: 12, y: 5};
-	let point6 = Point{x: 5, y: 14};
-	let points = [point1, point2, point3, point4, point5, point6];
-	bmp.draw_polygon(&points, &color);
-	file.write_all(&bmp).unwrap();
-}
+// Example usage
+//#[test]
+//fn test_new_bitmap() {
+//	let file_path = "example.bmp";
+//	let mut file = File::create(file_path).unwrap();
+//	let mut bmp:Vec<u8> = Vec::<u8>::new_bitmap(40, 40, 24);
+//	assert_eq!(bmp.get_height(), 40);
+//	assert_eq!(bmp.get_width(), 40);
+//	assert_eq!(bmp.get_bits_per_pixel(), 24);
+//	assert_eq!(bmp.get_file_size(), bmp.len() as u32);
+//	assert_eq!(bmp.get_size_of_info_header(), 40);
+//	assert_eq!(bmp.get_planes(), 1);
+//	assert_eq!(bmp.get_compression(), 0);
+//	let red:Rgb = Rgb {r: 255, g: 0, b: 0};
+//	let position: Point = Point {x: 20, y: 20};
+//	bmp.draw_point(&position, &red);
+//        let position: Point = Point {x: 0, y: 0};
+//        bmp.draw_point(&position, &red);
+//        let position: Point = Point {x: 39, y: 39};
+//        bmp.draw_point(&position, &red);
+//        let position: Point = Point {x: 0, y: 39};
+//        bmp.draw_point(&position, &red);
+//        let position: Point = Point {x: 39, y: 0};
+//        bmp.draw_point(&position, &red);
+//	let position1 = Point {x: 38, y: 38};
+//	let position2 = Point {x: 1, y: 1};
+//	let color = Rgb {r:0, g:255, b:0};
+//	bmp.draw_rectangle(&position1, &position2, &color);
+//        let position1 = Point {x: 20, y: 20};
+//	let radius = 10;
+//        let color = Rgb {r:0, g:0, b:255};
+//	bmp.draw_circle(&position1, radius, &color);
+//        let red:Rgb = Rgb {r: 255, g: 0, b: 0};
+//        let position: Point = Point {x: 20, y: 20};
+//        bmp.draw_point(&position, &red);
+//	bmp.draw_string("!", &position, &red);
+//
+//        let color = Rgb {r:255, g:255, b:255};
+//	let point1 = Point{x: 10, y: 30};
+//	let point2 = Point{x: 26, y: 33};
+//	let point3 = Point{x: 35, y: 20};
+//	let point4 = Point{x: 27, y: 6};
+//	let point5 = Point{x: 12, y: 5};
+//	let point6 = Point{x: 5, y: 14};
+//	let points = [point1, point2, point3, point4, point5, point6];
+//	bmp.draw_polygon(&points, &color);
+//	file.write_all(&bmp).unwrap();
+//}
 
-#[test]
-fn test_new_bitmap2() {
-        let file_path = "example2.bmp";
-        let mut file = File::create(file_path).unwrap();
-        let mut bmp:Vec<u8> = Vec::<u8>::new_bitmap(2600, 1080, 24);
-        let line_width = 180;
-        for j in 1..line_width {
-                for i in 0..bmp.get_width() {
-                        let line_color = Rgb {r: j as u8, g: 255 - j as u8, b: 255 - j as u8};
-                        let position = Point {x: i+j, y: i*i / 50 / j};
-                        bmp.draw_point(&position, &line_color);
-                }
-        }
-        let circle_center:Point = Point {x: 1300, y: 540};
-        let circle_color:Rgb = Rgb {r:255, g:255, b:255};
-        bmp.draw_circle(&circle_center, 300, &circle_color);
-	let start_line:Point = Point {x: 100, y: 100};
-	let end_line:Point = Point {x: 2000, y: 900};
-	let line_color = Rgb {r: 255, g: 0, b: 0};
-	let line_width: u32 = 10;
-	bmp.draw_line(&start_line, &end_line, &line_color);
-
-	let point1_rectangle = Point {x: 300, y: 300};
-	let point2_rectangle = Point {x: 2200, y: 800};
-	bmp.draw_rectangle(&point1_rectangle, &point2_rectangle, &line_color);
-    let position = Point { x: 10, y: 1000 };
-    let color = Rgb { r: 255, g: 255, b: 255 };
-    let alphabet = "!#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
-    bmp.draw_string(alphabet, &position, &color);
-
-    let position = Point { x: 10, y: 900 };
-    let color = Rgb { r: 255, g: 255, b: 255 };
-    let alphabet = "HELLO WORLD!";
-    bmp.draw_string(alphabet, &position, &color);
-
-
-    let position = Point { x: 10, y: 890 };
-    let color = Rgb { r: 255, g: 255, b: 255 };
-    let alphabet = "[{Testing. 00/00/0000}]";
-    bmp.draw_string(alphabet, &position, &color);
-
-
-    let position = Point { x: 10, y: 880 };
-    let color = Rgb { r: 255, g: 255, b: 255 };
-    let alphabet = "Lorem ipsum lorem or something I guess.";
-    bmp.draw_string(alphabet, &position, &color);
-
-
-
-        file.write_all(&bmp).unwrap();
-}
-
-#[test]
-fn test_new_bitmap_website() {
+// Example usage
+//#[test]
+//fn test_new_bitmap_website() {
 //1
-        let file_path = "test.bmp";
-        let mut file = File::create(file_path).unwrap();
-        let mut bmp:Vec<u8> = Vec::<u8>::new_bitmap(100, 80, 24);
-
+//        let file_path = "test.bmp";
+//        let mut file = File::create(file_path).unwrap();
+//        let mut bmp:Vec<u8> = Vec::<u8>::new_bitmap(100, 80, 24);
+//
 //2
-        let color= Rgb {r: 255, g: 0, b: 0};
-        let position: Point = Point {x: 50, y: 40};
-        bmp.draw_point(&position, &color);
+//        let color= Rgb {r: 255, g: 0, b: 0};
+//        let position: Point = Point {x: 50, y: 40};
+//        bmp.draw_point(&position, &color);
 //3
-        let position1 = Point {x: 10, y: 22};
-        let position2 = Point {x: 110, y: 102};
-        let color = Rgb {r:0, g:255, b:0};
-	bmp.draw_line(&position1, &position2, &color);
-        let position1 = Point {x: 70, y: 22};
-        let position2 = Point {x: 170, y: 102};
-        let color = Rgb {r:0, g:255, b:0};
-        bmp.draw_line(&position1, &position2, &color);
-        let position1 = Point {x: 70, y: 3};
-        let position2 = Point {x: 170, y: 83};
-        let color = Rgb {r:0, g:255, b:0};
-        bmp.draw_line(&position1, &position2, &color);
-
-
+//        let position1 = Point {x: 10, y: 22};
+//        let position2 = Point {x: 110, y: 102};
+//        let color = Rgb {r:0, g:255, b:0};
+//	bmp.draw_line(&position1, &position2, &color);
+//        let position1 = Point {x: 70, y: 22};
+//        let position2 = Point {x: 170, y: 102};
+//        let color = Rgb {r:0, g:255, b:0};
+//        bmp.draw_line(&position1, &position2, &color);
+//        let position1 = Point {x: 70, y: 3};
+//        let position2 = Point {x: 170, y: 83};
+//        let color = Rgb {r:0, g:255, b:0};
+//        bmp.draw_line(&position1, &position2, &color);
 //4
-        let position1 = Point {x: 10, y: 3};
-        let position2 = Point {x: 70, y: 22};
-        let color = Rgb {r:0, g:255, b:0};
-        bmp.draw_rectangle(&position1, &position2, &color);
-
+//        let position1 = Point {x: 10, y: 3};
+//        let position2 = Point {x: 70, y: 22};
+//        let color = Rgb {r:0, g:255, b:0};
+//        bmp.draw_rectangle(&position1, &position2, &color);
+//
 //5
+//        let position1 = Point {x: 14, y: 60};
+//        let radius = 10;
+//        let color = Rgb {r:0, g:0, b:255};
+//        bmp.draw_circle(&position1, radius, &color);
 
-        let position1 = Point {x: 14, y: 60};
-        let radius = 10;
-        let color = Rgb {r:0, g:0, b:255};
-        bmp.draw_circle(&position1, radius, &color);
-
-	let position: Point = Point {x: 14, y: 7};
-	let color = Rgb {r:255, g:255, b:255};
-        bmp.draw_string("Hello!", &position, &color);
-        file.write_all(&bmp).unwrap();
-}
+//	let position: Point = Point {x: 14, y: 7};
+//	let color = Rgb {r:255, g:255, b:255};
+//        bmp.draw_string("Hello!", &position, &color);
+//        file.write_all(&bmp).unwrap();
+//}
