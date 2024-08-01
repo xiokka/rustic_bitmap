@@ -2,23 +2,23 @@ use std::fs::File;
 use std::io::Write;
 
 mod get;
-use get::*;
+pub use get::*;
 
 mod constants;
-use crate::constants::*;
+pub use crate::constants::*;
 
 mod font;
 use crate::font::*;
 
 pub struct Point {
-	x: u32,
-	y: u32
+	pub x: u32,
+	pub y: u32
 }
 
 pub struct Rgb {
-	r: u8,
-	g: u8,
-	b: u8
+	pub r: u8,
+	pub g: u8,
+	pub b: u8
 }
 
 pub trait Bitmap {
