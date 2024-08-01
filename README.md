@@ -2,7 +2,25 @@
 ## Description
 A simple Rust library for bitmap manipulation. This library provides tools for reading, modifying, and writing bitmap images.
 
-## Example Usage
+## Installation
+Clone this library.
+```bash
+git clone https://github.com/xiokka/rustic_bitmap.git
+```
+
+Add the dependency to your Cargo.toml, specifying the location where you cloned the library.
+```toml
+[dependencies]
+rustic_bitmap = { path = "modify/this/path/to/library" }
+```
+
+In your Rust source file, import the crate to start using it:
+```rust
+use rustic_bitmap::*;
+```
+
+
+## Usage
 All operations are performed on vectors of bytes.
 ```rust
 //Create a new empty bitmap using new_bitmap(width, height, bits_per_pixel)
