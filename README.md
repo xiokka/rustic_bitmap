@@ -14,7 +14,7 @@ Add the dependency to your Cargo.toml, specifying the location where you cloned 
 rustic_bitmap = { path = "modify/this/path/to/library" }
 ```
 
-In your Rust source file, import the crate to start using it.
+In your Rust source file, import the crate.
 ```rust
 use rustic_bitmap::*;
 ```
