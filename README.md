@@ -24,7 +24,7 @@ use rustic_bitmap::*;
 All operations are performed on vectors of bytes.
 ```rust
 //Create a new empty bitmap using new_bitmap(width, height, bits_per_pixel)
-let mut bmp:Vec = Vec::::new_bitmap(88, 31, 24);
+let mut bmp:Vec<u8> = Vec::<u8>::new_bitmap(88, 31, 24);
 
 // Draws a circle with a given radius, center and color
 let circle_center = Point {x:87, y:0};
