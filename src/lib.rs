@@ -28,6 +28,7 @@ pub trait Bitmap {
 	fn draw_char(&mut self, char_index: usize, position: &Point, color:&Rgb);
 	fn draw_string(&mut self, string: &str, position: &Point, color: &Rgb);
 	fn draw_polygon(&mut self, points: &[Point], color: &Rgb);
+	fn has_file_signature(&self) -> bool;
 }
 
 impl Bitmap for Vec<u8> {
@@ -119,7 +120,11 @@ impl Bitmap for Vec<u8> {
 	}
 
 	fn point_exists(&self, point: &Point) -> bool {
-		return ( (self.get_height() > point.y) && (self.get_width() > point.x) );
+                if !self.has_file_signature() {
+                        eprintln!("Invalid file. Not a Bitmap.");
+                        return false;
+                }
+		return (self.get_height() > point.y) && (self.get_width() > point.x);
 	}
 
 	fn draw_circle(&mut self, center: &Point, radius: u32, color: &Rgb) {
@@ -180,67 +185,69 @@ impl Bitmap for Vec<u8> {
 		self.draw_line(&point4, &point1, &color);
 	}
 
-fn draw_char(&mut self, char_index: usize, position: &Point, color: &Rgb) {
-    // Ensure char_index is within bounds of FONT_BITMAP
-    if char_index >= FONT_BITMAP.len() {
-        return; // or handle the error as appropriate
-    }
+	fn draw_char(&mut self, char_index: usize, position: &Point, color: &Rgb) {
+		// Ensure char_index is within bounds of FONT_BITMAP
+		if char_index >= FONT_BITMAP.len() {
+			return; // or handle the error as appropriate
+		}
 
-    // Get the bitmap for the character
-    let bitmap = &FONT_BITMAP[char_index];
+		// Get the bitmap for the character
+		let bitmap = &FONT_BITMAP[char_index];
 
-    // Iterate over rows of the character's bitmap from bottom to top
-    for row in (0..FONT_HEIGHT).rev() {
-        // Iterate over columns of the character's bitmap from left to right
-        for col in 0..FONT_WIDTH {
-            // Calculate the index into the bitmap
-            let bit_index = (FONT_HEIGHT - 1 - row) * FONT_WIDTH + col;
-            let byte_index = bit_index / 8;
-            let bit_position = 7 - (bit_index % 8);
-
-            // Ensure the byte index is within bounds of the bitmap array
-            if byte_index < bitmap.len() {
-                // Create a mask for the bit position
-                let mask = 1 << bit_position;
-
-                // Check if the specific bit is set
-                if (bitmap[byte_index] & mask) != 0 {
-                    // Calculate the correct x and y coordinates for the point
-                    let x = position.x as u32 + (FONT_WIDTH - 1 - col) as u32;
-                    let y = position.y as u32 + row as u32;
-
-                    // Draw the point
-                    let point = Point { x, y };
-                    self.draw_point(&point, color);
-                }
-            }
-        }
-    }
-}
-
-
-fn draw_string(&mut self, string: &str, position: &Point, color: &Rgb) {
-    let mut x_offset = position.x; // Start at the initial x position
-
-    // Iterate over each character in the string
-    for char in string.chars() {
-        // Find the index of the character in the font bitmap
-        let char_index = char as usize - 32;
-
-        // Draw the character at the current position
-        self.draw_char(char_index, &Point { x: x_offset, y: position.y }, color);
-
-        // Move the x offset by the width of the character plus any spacing
-        x_offset += FONT_WIDTH as u32; // Adjust this if you have spacing between characters
-    }
-}
-
-fn draw_polygon(&mut self, points: &[Point], color: &Rgb) {
-	for i in 0..points.len()-1 {
-		self.draw_line(&points[i], &points[i+1], color);
+		// Iterate over rows of the character's bitmap from bottom to top
+		for row in (0..FONT_HEIGHT).rev() {
+			// Iterate over columns of the character's bitmap from left to right
+			for col in 0..FONT_WIDTH {
+				// Calculate the index into the bitmap
+				let bit_index = (FONT_HEIGHT - 1 - row) * FONT_WIDTH + col;
+				let byte_index = bit_index / 8;
+				let bit_position = 7 - (bit_index % 8);
+	
+				// Ensure the byte index is within bounds of the bitmap array
+				if byte_index < bitmap.len() {
+					// Create a mask for the bit position
+					let mask = 1 << bit_position;
+	
+					// Check if the specific bit is set
+					if (bitmap[byte_index] & mask) != 0 {
+						// Calculate the correct x and y coordinates for the point
+						let x = position.x as u32 + (FONT_WIDTH - 1 - col) as u32;
+						let y = position.y as u32 + row as u32;
+	
+						// Draw the point
+						let point = Point { x, y };
+						self.draw_point(&point, color);
+					}
+				}
+			}
+		}
 	}
-	self.draw_line(&points[0], &points[points.len()-1], color); 
-}
+
+
+	fn draw_string(&mut self, string: &str, position: &Point, color: &Rgb) {
+		let mut x_offset = position.x; // Start at the initial x position
+		// Iterate over each character in the string
+		for char in string.chars() {
+			// Find the index of the character in the font bitmap
+			let char_index = char as usize - 32;
+			// Draw the character at the current position
+			self.draw_char(char_index, &Point { x: x_offset, y: position.y }, color);
+			// Move the x offset by the width of the character plus any spacing
+			x_offset += FONT_WIDTH as u32;
+		}
+	}
+
+	fn draw_polygon(&mut self, points: &[Point], color: &Rgb) {
+		for i in 0..points.len()-1 {
+			self.draw_line(&points[i], &points[i+1], color);
+		}
+		self.draw_line(&points[0], &points[points.len()-1], color); 
+	}
+
+	// Checks if a vector of bytes has the BMP file signature
+	fn has_file_signature(&self) -> bool {
+		return self[0] == b'B' && self[1] == b'M';
+	}
 
 }
 
@@ -336,3 +343,47 @@ fn draw_polygon(&mut self, points: &[Point], color: &Rgb) {
 //        bmp.draw_string("Hello!", &position, &color);
 //        file.write_all(&bmp).unwrap();
 //}
+
+
+#[test]
+fn test_1() {
+use std::fs::File;
+use std::io::Write;
+        // All operations are performed on vectors of bytes.
+        // Create a new empty bitmap using new_bitmap(width, height, bits_per_pixel)
+        let mut bmp:Vec<u8> = Vec::<u8>::new_bitmap(88, 31, 24);
+
+        // Draws the weird green web thingy on the left
+        for i in 0..7 {
+                let position1: Point = Point {x: 0, y: i*10};
+                let position2: Point = Point {x: 70 - i*10, y:0};
+                let color = Rgb {r:0, g:255, b:0};
+                bmp.draw_line(&position1, &position2, &color);
+        }
+
+        // Draws a circle with a given radius, center and color
+        let circle_center = Point {x:87, y:0};
+        let color_circle = Rgb {r:255, g:0, b:0};
+        let radius = 20;
+        bmp.draw_circle(&circle_center, radius, &color_circle);
+
+        // Draws a blue rectangle where position1 and position2 are opposing corners
+        let position1: Point = Point {x: 0, y: 0};
+        let position2: Point = Point {x: 87, y:30};
+        let color = Rgb {r:0, g:0, b:255};
+        bmp.draw_rectangle(&position1, &position2, &color);
+
+        // Draws project name
+        let position: Point = Point {x: 38, y: 20};
+        let color = Rgb {r:255, g:255, b:255};
+        bmp.draw_string("RUSTIC", &position, &color);
+        let position: Point = Point {x: 38, y: 10};
+        let color = Rgb {r:255, g:255, b:255};
+        bmp.draw_string("BITMAP", &position, &color);
+
+        // Store vector of bytes in file_path
+        let file_path = "button.bmp";
+        let mut file = File::create(file_path).unwrap();
+        file.write_all(&bmp).unwrap();
+
+}
