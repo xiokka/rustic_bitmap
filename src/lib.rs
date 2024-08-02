@@ -121,7 +121,7 @@ impl Bitmap for Vec<u8> {
 
 	fn point_exists(&self, point: &Point) -> bool {
                 if !self.has_file_signature() {
-                        eprintln!("Invalid file. Not a Bitmap.");
+                        eprintln!("Invalid file signature. Not a Bitmap.");
                         return false;
                 }
 		return (self.get_height() > point.y) && (self.get_width() > point.x);
