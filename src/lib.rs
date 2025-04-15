@@ -12,6 +12,7 @@ pub struct Point {
 	pub y: u32
 }
 
+#[derive(Debug, PartialEq)]
 pub struct Rgb {
 	pub r: u8,
 	pub g: u8,
@@ -344,4 +345,58 @@ impl Bitmap for Vec<u8> {
 //        file.write_all(&bmp).unwrap();
 //}
 
+#[test]
+fn test_get_pixel() {
+	let mut bmp:Vec<u8> = Vec::<u8>::new_bitmap(100, 80, 24);
+	let color = Rgb {r: 135, g:0, b:0};
+	let position = Point {x: 10, y:8};
+	bmp.draw_point(&position, &color);
+	let test = bmp.get_pixel(&position).unwrap();
+	assert_eq!(color, test);
+}
 
+#[test]
+fn test_get_padding_per_line() {
+        let mut bmp:Vec<u8> = Vec::<u8>::new_bitmap(100, 10, 24);
+	let padding_per_line = bmp.get_padding_per_line();
+	let expected_padding = 0;
+	assert_eq!(padding_per_line, expected_padding);
+
+        let mut bmp:Vec<u8> = Vec::<u8>::new_bitmap(101, 10, 24);
+        let padding_per_line = bmp.get_padding_per_line();
+        let expected_padding = 1;
+        assert_eq!(padding_per_line, expected_padding);
+
+        let mut bmp:Vec<u8> = Vec::<u8>::new_bitmap(102, 10, 24);
+        let padding_per_line = bmp.get_padding_per_line();
+        let expected_padding = 2;
+        assert_eq!(padding_per_line, expected_padding);
+
+        let mut bmp:Vec<u8> = Vec::<u8>::new_bitmap(103, 10, 24);
+        let padding_per_line = bmp.get_padding_per_line();
+        let expected_padding = 3;
+        assert_eq!(padding_per_line, expected_padding);
+}
+
+#[test]
+fn test_get_padding_size() {
+        let mut bmp:Vec<u8> = Vec::<u8>::new_bitmap(100, 10, 24);
+        let padding = bmp.get_padding_size();
+        let expected_padding = 0;
+        assert_eq!(padding, expected_padding);
+
+        let mut bmp:Vec<u8> = Vec::<u8>::new_bitmap(101, 10, 24);
+        let padding = bmp.get_padding_size();
+        let expected_padding = 10;
+        assert_eq!(padding, expected_padding);
+
+        let mut bmp:Vec<u8> = Vec::<u8>::new_bitmap(102, 10, 24);
+        let padding = bmp.get_padding_size();
+        let expected_padding = 20;
+        assert_eq!(padding, expected_padding);
+
+        let mut bmp:Vec<u8> = Vec::<u8>::new_bitmap(103, 10, 24);
+        let padding = bmp.get_padding_size();
+        let expected_padding = 30;
+        assert_eq!(padding, expected_padding);
+}
